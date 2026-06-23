@@ -29,6 +29,9 @@
     "graphql": "^16"
   },
   "packageManager": "yarn@4.17.0",
+  "scripts": {
+    "test": "vitest run"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@graphql-codegen/plugin-helpers": "^7.0.1",

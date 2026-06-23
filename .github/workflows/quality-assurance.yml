@@ -12,13 +12,7 @@ jobs:
     strategy:
       matrix:
         script:
-          [
-            "yarn eslint .",
-            "yarn tsc",
-            "yarn prettier . --check",
-            "yarn test",
-            "yarn build",
-          ]
+          ["yarn eslint .", "yarn tsc", "yarn prettier . --check", "yarn build"]
       # Default behaviour is "true" - which cancels all queued or in-progress jobs when one fails, which we don't want.
       fail-fast: false
     runs-on: ubuntu-latest
@@ -36,3 +30,34 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Script
         run: ${{ matrix.script }}
+
+  test:
+    name: "test (node ${{ matrix.node }}, graphql ${{ matrix.graphql }})"
+    strategy:
+      matrix:
+        # Node versions capable of running the test toolchain (vitest 4 / vite 8
+        # require Node ^20.19 || >=22.12). graphql-codegen itself supports Node
+        # >=16, but the plugin's *runtime* support isn't exercised here — only
+        # the test harness, which needs a newer Node.
+        node: ["20", "22", "24"]
+        # graphql majors supported by graphql-codegen (@graphql-codegen/plugin-helpers
+        # declares graphql ^14 || ^15 || ^16).
+        graphql: ["14", "15", "16"]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out git
+        uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Pin graphql to matrix version
+        run: yarn add --dev "graphql@^${{ matrix.graphql }}"
+      - name: Test
+        run: yarn test

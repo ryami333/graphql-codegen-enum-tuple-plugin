@@ -1,0 +1,31 @@
+name: Quality Assurance
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  quality-assurance:
+    strategy:
+      matrix:
+        script: ["yarn eslint .", "yarn tsc", "yarn prettier . --check"]
+      # Default behaviour is "true" - which cancels all queued or in-progress jobs when one fails, which we don't want.
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out git
+        uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Script
+        run: ${{ matrix.script }}

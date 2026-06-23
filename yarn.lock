@@ -1795,7 +1795,7 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@graphql-codegen/plugin-helpers": ^5 || ^6 || ^7
-    graphql: ^16
+    graphql: ^14 || ^15 || ^16
   languageName: unknown
   linkType: soft
 

@@ -1,6 +1,6 @@
 {
   "name": "graphql-codegen-enum-tuple-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A GraphQL Code Generator plugin that emits each GraphQL enum as a readonly tuple of its member names.",
   "license": "MIT",
   "author": "mitch@mitch-ryan.com",

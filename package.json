@@ -32,7 +32,8 @@
   "scripts": {
     "build": "vite build",
     "prepack": "vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release": "GITHUB_TOKEN=$(gh auth token) yarn release-it"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -41,6 +42,7 @@
     "eslint": "^10.5.0",
     "graphql": "^16",
     "prettier": "^3.8.4",
+    "release-it": "^20.2.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0",
     "vite": "^8.1.0",

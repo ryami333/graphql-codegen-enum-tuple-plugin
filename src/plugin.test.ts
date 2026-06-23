@@ -8,9 +8,12 @@ import enumTuplesPlugin from "./plugin.ts";
  * it, exactly as graphql-codegen would at generation time — no `codegen.ts`
  * config or file I/O required.
  */
-function generate(sdl: string): string {
+function generate(
+  sdl: string,
+  config: Parameters<typeof enumTuplesPlugin.plugin>[2] = {},
+): string {
   const schema = buildSchema(sdl);
-  const output = enumTuplesPlugin.plugin(schema, [], {});
+  const output = enumTuplesPlugin.plugin(schema, [], config);
   // The CodegenPlugin contract allows a string, a structured object, or a
   // promise; this plugin always returns a plain string synchronously, so narrow
   // to that (and fail loudly if the contract ever changes).
@@ -64,5 +67,32 @@ describe("enumTuplesPlugin", () => {
     // A schema with no user-defined enums must yield an empty string, proving
     // the built-in introspection enums are filtered out.
     expect(generate(`type Query { hello: String }`)).toBe("");
+  });
+
+  it("appends a custom tupleSuffix", () => {
+    expect(generate(`enum Color { RED }`, { tupleSuffix: "Tuple" })).toBe(
+      `export const colorTuple = ["RED"] as const;`,
+    );
+  });
+
+  it("prepends a tuplePrefix and keeps the type name's casing", () => {
+    expect(generate(`enum Color { RED }`, { tuplePrefix: "enum" })).toBe(
+      `export const enumColorValues = ["RED"] as const;`,
+    );
+  });
+
+  it("combines tuplePrefix and tupleSuffix", () => {
+    expect(
+      generate(`enum Color { RED }`, {
+        tuplePrefix: "enum",
+        tupleSuffix: "Tuple",
+      }),
+    ).toBe(`export const enumColorTuple = ["RED"] as const;`);
+  });
+
+  it("allows an empty tupleSuffix", () => {
+    expect(
+      generate(`enum Color { RED }`, { tuplePrefix: "all", tupleSuffix: "" }),
+    ).toBe(`export const allColor = ["RED"] as const;`);
   });
 });

@@ -1,20 +1,37 @@
 import type { CodegenPlugin } from "@graphql-codegen/plugin-helpers";
 import { isEnumType } from "graphql";
 
+/** Configuration accepted by the enum-tuples plugin. */
+export interface EnumTuplesPluginConfig {
+  /**
+   * String prepended to each generated const name. Defaults to `""`. When set,
+   * the enum's type name keeps its original casing so it reads as camelCase
+   * (e.g. `tuplePrefix: "enum"` → `enumAbteilungTypeValues`).
+   */
+  tuplePrefix?: string;
+  /** String appended to each generated const name. Defaults to `"Values"`. */
+  tupleSuffix?: string;
+}
+
 /**
  * Emits each GraphQL enum as a readonly tuple of its member names, e.g.
  * `export const abteilungTypeValues = ["JUGENDHILFE", "MIGRATION"] as const;`.
  */
-const enumTuplesPlugin: CodegenPlugin = {
-  plugin: (schema) =>
-    Object.values(schema.getTypeMap())
+const enumTuplesPlugin: CodegenPlugin<EnumTuplesPluginConfig> = {
+  plugin: (schema, _documents, config) => {
+    const { tuplePrefix = "", tupleSuffix = "Values" } = config;
+    return Object.values(schema.getTypeMap())
       .filter(isEnumType)
       // Skip introspection enums (__TypeKind, __DirectiveLocation, …).
       .filter((type) => !type.name.startsWith("__"))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((type) => {
-        const constName =
-          type.name.charAt(0).toLowerCase() + type.name.slice(1) + "Values";
+        // With no prefix the leading character is lowercased; with a prefix the
+        // type name keeps its casing so it joins in camelCase.
+        const typePart = tuplePrefix
+          ? type.name
+          : type.name.charAt(0).toLowerCase() + type.name.slice(1);
+        const constName = tuplePrefix + typePart + tupleSuffix;
         const members = type
           .getValues()
           .map((value) => value.name)
@@ -23,7 +40,8 @@ const enumTuplesPlugin: CodegenPlugin = {
           .join(", ");
         return `export const ${constName} = [${members}] as const;`;
       })
-      .join("\n\n"),
+      .join("\n\n");
+  },
 };
 
 export default enumTuplesPlugin;

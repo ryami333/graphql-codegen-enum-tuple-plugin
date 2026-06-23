@@ -3,7 +3,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["node_modules/", ".yarn/"],
+    ignores: ["node_modules/", ".yarn/", "dist/"],
   },
   eslintJs.configs.recommended,
   ...tseslint.configs.recommended,

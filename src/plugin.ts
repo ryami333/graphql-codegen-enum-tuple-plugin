@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-const { isEnumType } = require("graphql");
+import type { CodegenPlugin } from "@graphql-codegen/plugin-helpers";
+import { isEnumType } from "graphql";
 
 /**
  * Emits each GraphQL enum as a readonly tuple of its member names, e.g.
  * `export const abteilungTypeValues = ["JUGENDHILFE", "MIGRATION"] as const;`.
- *
- * @type {import("@graphql-codegen/plugin-helpers").CodegenPlugin}
  */
-const enumTuplesPlugin = {
+const enumTuplesPlugin: CodegenPlugin = {
   plugin: (schema) =>
     Object.values(schema.getTypeMap())
       .filter(isEnumType)
@@ -28,4 +26,4 @@ const enumTuplesPlugin = {
       .join("\n\n"),
 };
 
-module.exports = enumTuplesPlugin;
+export default enumTuplesPlugin;

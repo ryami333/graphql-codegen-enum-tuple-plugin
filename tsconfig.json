@@ -8,6 +8,7 @@
     "allowJs": true,
     "checkJs": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,5 +23,6 @@
     "**/*.jsx",
     "**/*.cjs",
     "**/*.mjs"
-  ]
+  ],
+  "exclude": ["dist"]
 }

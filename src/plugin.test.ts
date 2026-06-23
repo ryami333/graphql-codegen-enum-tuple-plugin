@@ -1,7 +1,7 @@
 import { buildSchema } from "graphql";
 import { describe, expect, it } from "vitest";
 
-import enumTuplesPlugin from "./plugin.cjs";
+import enumTuplesPlugin from "./plugin.ts";
 
 /**
  * Helper that builds an in-memory schema from SDL and runs the plugin against

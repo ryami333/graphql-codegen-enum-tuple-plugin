@@ -1,7 +1,6 @@
 import type { CodegenPlugin } from "@graphql-codegen/plugin-helpers";
 import { isEnumType } from "graphql";
 
-/** Configuration accepted by the enum-tuples plugin. */
 export interface EnumTuplesPluginConfig {
   /**
    * String prepended to each generated const name. Defaults to `""`. When set,
@@ -13,18 +12,17 @@ export interface EnumTuplesPluginConfig {
   tupleSuffix?: string;
 }
 
-/**
- * Emits each GraphQL enum as a readonly tuple of its member names, e.g.
- * `export const abteilungTypeValues = ["JUGENDHILFE", "MIGRATION"] as const;`.
- */
 const enumTuplesPlugin: CodegenPlugin<EnumTuplesPluginConfig> = {
   plugin: (schema, _documents, config) => {
     const { tuplePrefix = "", tupleSuffix = "Values" } = config;
-    return Object.values(schema.getTypeMap())
+
+    const enumTypes = Object.values(schema.getTypeMap())
       .filter(isEnumType)
       // Skip introspection enums (__TypeKind, __DirectiveLocation, …).
       .filter((type) => !type.name.startsWith("__"))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return enumTypes
       .map((type) => {
         // With no prefix the leading character is lowercased; with a prefix the
         // type name keeps its casing so it joins in camelCase.
@@ -36,9 +34,9 @@ const enumTuplesPlugin: CodegenPlugin<EnumTuplesPluginConfig> = {
           .getValues()
           .map((value) => value.name)
           .sort((a, b) => a.localeCompare(b))
-          .map((name) => JSON.stringify(name))
-          .join(", ");
-        return `export const ${constName} = [${members}] as const;`;
+          .map((name) => JSON.stringify(name));
+
+        return `export const ${constName} = [${members.join(", ")}] as const;`;
       })
       .join("\n\n");
   },
